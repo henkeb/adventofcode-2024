@@ -8,7 +8,8 @@ mod solutions;
 
 fn main() -> Result<(), Box<dyn Error>> {
     let setup: bool = match std::env::args().nth(2) {
-        Some(val) => val.parse()?,
+        Some(val) if val == "t" => true,
+        Some(..) => false,
         None => false,
     };
     match std::env::args()
@@ -19,10 +20,11 @@ fn main() -> Result<(), Box<dyn Error>> {
         day if day >= 1 && day <= 25 => {
             if setup {
                 create_daily_file(day)?;
+                get_input(day)?;
                 add_mod(day)?;
             } else {
-                println!("Puzzle 1: {}", day01::puzzle_1(get_input(day)?));
-                println!("Puzzle 2: {}", day01::puzzle_2(get_input(day)?));
+                println!("Puzzle 1: {}", day01::puzzle_1(&get_input(day)?));
+                println!("Puzzle 2: {}", day01::puzzle_2(&get_input(day)?));
             }
         }
         _ => println!("Wrong input!"),

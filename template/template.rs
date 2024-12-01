@@ -1,8 +1,8 @@
-pub fn puzzle_1(input: String) -> String {
+pub fn puzzle_1(input: &str) -> String {
     "Not implemented yet!".to_string()
 }
 
-pub fn puzzle_2(input: String) -> String {
+pub fn puzzle_2(input: &str) -> String {
     "Not implemented yet!".to_string()
 }
 
@@ -13,12 +13,12 @@ mod tests {
     #[test]
     fn test_1() {
         let input: String = "".to_owned();
-        assert_eq!(puzzle_1(input), "");
+        assert_eq!(puzzle_1(&input), "");
     }
 
     #[test]
     fn test_2() {
         let input: String = "".to_owned();
-        assert_eq!(puzzle_2(input), "");
+        assert_eq!(puzzle_2(&input), "");
     }
 }
