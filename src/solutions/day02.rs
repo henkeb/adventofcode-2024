@@ -56,22 +56,16 @@ fn is_line_safe(line: &[usize]) -> bool {
         std::cmp::Ordering::Greater => _is_ascending = false,
     }
 
-    let mut _is_safe = true;
     for i in 1..line.len() {
         match line[i - 1].cmp(&line[i]) {
-            std::cmp::Ordering::Equal => {
-                _is_safe = false;
-                break;
-            }
             std::cmp::Ordering::Less if _is_ascending && line[i] - line[i - 1] <= 3 => continue,
             std::cmp::Ordering::Greater if !_is_ascending && line[i - 1] - line[i] <= 3 => continue,
             _ => {
-                _is_safe = false;
-                break;
+                return false;
             }
         }
     }
-    _is_safe
+    true
 }
 
 #[cfg(test)]
