@@ -1,6 +1,6 @@
 // Solution has
 // Time complexity: O(n)
-// Space complexity: O(n)
+// Space complexity: O(1)
 pub fn puzzle_1(input: &str) -> String {
     input
         .lines()
@@ -25,7 +25,7 @@ pub fn puzzle_1(input: &str) -> String {
 
 // Solution has
 // Time complexity: O(n*m)
-// Space complexity: O(n)
+// Space complexity: O(1)
 pub fn puzzle_2(input: &str) -> String {
     input
         .lines()
