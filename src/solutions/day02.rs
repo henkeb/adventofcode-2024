@@ -44,14 +44,13 @@ pub fn puzzle_2(input: &str) -> String {
 
 fn is_line_safe(line: &[usize]) -> bool {
     let mut _is_ascending = false;
-    let mut _is_safe = false;
     match line[0].cmp(&line[1]) {
         std::cmp::Ordering::Equal => return false,
         std::cmp::Ordering::Less => _is_ascending = true,
         std::cmp::Ordering::Greater => _is_ascending = false,
     }
 
-    _is_safe = true;
+    let mut _is_safe = true;
     for i in 1..line.len() {
         match line[i - 1].cmp(&line[i]) {
             std::cmp::Ordering::Equal => {
