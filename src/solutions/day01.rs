@@ -1,5 +1,8 @@
 use std::collections::HashMap;
 
+// Solution has
+// Time complexity: O(n)
+// Space complexity: O(n)
 pub fn puzzle_1(input: &str) -> usize {
     let (mut left, mut right): (Vec<usize>, Vec<usize>) = (Vec::new(), Vec::new());
     for line in input.lines() {
@@ -18,6 +21,9 @@ pub fn puzzle_1(input: &str) -> usize {
         .fold(0, |acc, (left, right)| acc + left.abs_diff(*right))
 }
 
+// Solution has
+// Time complexity: O(n)
+// Space complexity: O(n)
 pub fn puzzle_2(input: &str) -> usize {
     let (mut left, mut right) = (HashMap::new(), HashMap::new());
     for line in input.lines() {

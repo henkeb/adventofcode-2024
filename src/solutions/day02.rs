@@ -1,3 +1,6 @@
+// Solution has
+// Time complexity: O(n)
+// Space complexity: O(1) (width of line)
 pub fn puzzle_1(input: &str) -> String {
     input
         .lines()
@@ -20,6 +23,9 @@ pub fn puzzle_1(input: &str) -> String {
         .to_string()
 }
 
+// Solution has
+// Time complexity: O(n*m)
+// Space complexity: O(1) (width of line)
 pub fn puzzle_2(input: &str) -> String {
     input
         .lines()
