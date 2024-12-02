@@ -48,7 +48,11 @@ fn get_input(day: usize) -> Result<String, Box<dyn Error>> {
     } else {
         let url = format!("https://adventofcode.com/{}/day/{}/input", 2024, day);
 
-        let puzzle_input = reqwest::blocking::Client::new().get(url).send()?.text()?;
+        let puzzle_input = reqwest::blocking::Client::new()
+            .get(url)
+            .header("Cookie", "session=EnterYourCookieHere")
+            .send()?
+            .text()?;
 
         fs::write(file_path, &puzzle_input)?;
         Ok(puzzle_input)
