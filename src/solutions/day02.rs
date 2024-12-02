@@ -12,7 +12,7 @@ pub fn puzzle_1(input: &str) -> String {
         })
         .fold(
             0,
-            |acc: usize, line| {
+            |acc, line| {
                 if is_line_safe(&line) {
                     acc + 1
                 } else {
@@ -35,7 +35,7 @@ pub fn puzzle_2(input: &str) -> String {
                 .filter_map(|val| val.parse::<usize>().ok())
                 .collect::<Vec<usize>>()
         })
-        .fold(0, |acc: usize, line| {
+        .fold(0, |acc, line| {
             for i in 0..line.len() {
                 let first_half = &line[0..i];
                 let second_half = &line[i + 1..line.len()];
