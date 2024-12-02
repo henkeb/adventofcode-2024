@@ -37,9 +37,9 @@ pub fn puzzle_2(input: &str) -> String {
         })
         .fold(0, |acc, line| {
             for i in 0..line.len() {
-                let first_half = &line[0..i];
-                let second_half = &line[i + 1..line.len()];
-                if is_line_safe(&[first_half, second_half].concat()) {
+                let first_part = &line[0..i];
+                let second_part = &line[i + 1..line.len()];
+                if is_line_safe(&[first_part, second_part].concat()) {
                     return acc + 1;
                 }
             }
