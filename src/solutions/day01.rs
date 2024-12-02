@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 // Solution has
-// Time complexity: O(n)
+// Time complexity: O(n*log(n))
 // Space complexity: O(n)
 pub fn puzzle_1(input: &str) -> usize {
     let (mut left, mut right): (Vec<usize>, Vec<usize>) = (Vec::new(), Vec::new());
