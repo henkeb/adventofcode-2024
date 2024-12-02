@@ -1,7 +1,13 @@
+// Solution has
+// Time complexity: O(?)
+// Space complexity: O(?)
 pub fn puzzle_1(input: &str) -> String {
     "Not implemented yet!".to_string()
 }
 
+// Solution has
+// Time complexity: O(?)
+// Space complexity: O(?)
 pub fn puzzle_2(input: &str) -> String {
     "Not implemented yet!".to_string()
 }
