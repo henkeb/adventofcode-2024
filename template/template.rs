@@ -16,15 +16,15 @@ pub fn puzzle_2(input: &str) -> String {
 mod tests {
     use super::*;
 
+    const INPUT: &str = "";
+
     #[test]
     fn test_1() {
-        let input: String = "".to_owned();
-        assert_eq!(puzzle_1(&input), "");
+        assert_eq!(puzzle_1(&INPUT), "");
     }
 
     #[test]
     fn test_2() {
-        let input: String = "".to_owned();
-        assert_eq!(puzzle_2(&input), "");
+        assert_eq!(puzzle_2(&INPUT), "");
     }
 }

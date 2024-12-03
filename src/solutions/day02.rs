@@ -72,27 +72,20 @@ fn is_line_safe(line: &[usize]) -> bool {
 mod tests {
     use super::*;
 
-    #[test]
-    fn test_1() {
-        let input: String = "7 6 4 2 1
+    const INPUT: &str = "7 6 4 2 1
 1 2 7 8 9
 9 7 6 2 1
 1 3 2 4 5
 8 6 4 4 1
-1 3 6 7 9"
-            .to_owned();
-        assert_eq!(puzzle_1(&input), "2");
+1 3 6 7 9";
+
+    #[test]
+    fn test_1() {
+        assert_eq!(puzzle_1(&INPUT), "2");
     }
 
     #[test]
     fn test_2() {
-        let input: String = "7 6 4 2 1
-1 2 7 8 9
-9 7 6 2 1
-1 3 2 4 5
-8 6 4 4 1
-1 3 6 7 9"
-            .to_owned();
-        assert_eq!(puzzle_2(&input), "4");
+        assert_eq!(puzzle_2(&INPUT), "4");
     }
 }
