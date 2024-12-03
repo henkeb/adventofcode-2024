@@ -39,7 +39,6 @@ pub fn puzzle_2(input: &str) -> String {
     input
         .lines()
         .fold(0, |acc, line| {
-            let mut result = 0;
             let matches: Vec<_> = line.match_indices("mul(").map(|(i, _)| i).collect();
             let doer: Vec<(usize, bool)> =
                 line.match_indices("do()").map(|(i, _)| (i, true)).collect();
@@ -50,13 +49,14 @@ pub fn puzzle_2(input: &str) -> String {
             let mut ranges: Vec<&(usize, bool)> = doer.iter().chain(&dont).collect();
             ranges.sort_unstable_by_key(|i| i.0);
 
-            for mul_match in matches {
-                is_active = find_do_dont_range(&ranges, mul_match, is_active);
+            acc + matches.iter().fold(0, |acc, mul_match| {
+                is_active = find_do_dont_range(&ranges, *mul_match, is_active);
                 if is_active {
-                    result += find_mul_values_and_calc(&line, mul_match);
+                    acc + find_mul_values_and_calc(&line, *mul_match)
+                } else {
+                    acc
                 }
-            }
-            acc + result
+            })
         })
         .to_string()
 }
