@@ -24,11 +24,7 @@ pub fn puzzle_1(input: &str) -> String {
     count.to_string()
 }
 
-fn check_bounds(
-    position: &(usize, usize),
-    dir: &(isize, isize),
-    input: &str,
-) -> Option<(usize, usize)> {
+fn get_char(input: &str, position: &(usize, usize), dir: &(isize, isize)) -> Option<char> {
     let row: isize = position.0 as isize + dir.0;
     let col: isize = position.1 as isize + dir.1;
 
@@ -36,41 +32,26 @@ fn check_bounds(
         let row = row as usize;
         let col = col as usize;
         if row < input.lines().count() && col < input.lines().next().unwrap().len() {
-            return Some((row as usize, col as usize));
+            if let Some(row) = input.lines().nth(row) {
+                return row.chars().nth(col);
+            }
         }
     }
     None
 }
 
-fn get_char(input: &str, position: &(usize, usize)) -> Option<char> {
-    if let Some(line) = input.lines().nth(position.0) {
-        line.chars().nth(position.1)
-    } else {
-        None
-    }
-}
-
 fn search(position: (usize, usize), input: &str) -> usize {
     let mut count = 0;
+    let mut _ch_arr = ['X'; 4];
     for dir in DIRECTION.iter() {
-        if let Some(pos_m) = check_bounds(&position, dir, input) {
-            if let Some(next_ch) = get_char(input, &pos_m) {
-                if next_ch == 'M' {
-                    if let Some(pos_a) = check_bounds(&pos_m, dir, input) {
-                        if let Some(next_ch) = get_char(input, &pos_a) {
-                            if next_ch == 'A' {
-                                if let Some(pos_s) = check_bounds(&pos_a, dir, input) {
-                                    if let Some(next_ch) = get_char(input, &pos_s) {
-                                        if next_ch == 'S' {
-                                            count += 1;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+        _ch_arr = ['X'; 4];
+        for i in 1..=3 {
+            if let Some(ch) = get_char(input, &position, &(dir.0 * i, dir.1 * i)) {
+                _ch_arr[i as usize] = ch;
             }
+        }
+        if _ch_arr.into_iter().eq("XMAS".chars()) {
+            count += 1;
         }
     }
     count
@@ -95,10 +76,8 @@ pub fn puzzle_2(input: &str) -> String {
 fn search_x(position: (usize, usize), input: &str) -> usize {
     let mut ch_arr: [char; 4] = ['0'; 4];
     for (i, dir) in DIRECTION_DIAG.iter().enumerate() {
-        if let Some(pos) = check_bounds(&position, dir, input) {
-            if let Some(ch) = get_char(input, &pos) {
-                ch_arr[i] = ch;
-            }
+        if let Some(ch) = get_char(input, &position, dir) {
+            ch_arr[i] = ch;
         }
     }
     if ch_arr[0] == 'M' && ch_arr[3] == 'S' || ch_arr[0] == 'S' && ch_arr[3] == 'M' {
