@@ -57,8 +57,7 @@ pub fn puzzle_1(input: &str) -> String {
             handled_values.insert(*value);
         }
         if is_update_ok {
-            let len = &update.len() / 2;
-            count += update[len];
+            count += update[update.len() / 2];
         }
     }
     count.to_string()
@@ -121,8 +120,7 @@ pub fn puzzle_2(input: &str) -> String {
                 }
             }
         }
-        let len = &ordered.len() / 2;
-        count += ordered[len];
+        count += ordered[ordered.len() / 2];
     }
 
     count.to_string()
