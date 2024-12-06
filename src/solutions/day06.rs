@@ -1,4 +1,6 @@
-#[derive(Debug, Clone)]
+use std::{collections::HashSet, hash::Hash};
+
+#[derive(Debug, Clone, Eq, Hash, PartialEq)]
 enum Direction {
     North,
     East,
@@ -21,7 +23,7 @@ enum Tile {
     Free,
     Outside,
 }
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Hash, Eq)]
 struct Coordinate {
     pub x: i32,
     pub y: i32,
@@ -29,22 +31,22 @@ struct Coordinate {
 struct Guard {
     position: Coordinate,
     direction: Direction,
-    visited: Vec<Vec<bool>>,
+    visited: HashSet<(Coordinate, Direction)>,
     map: Vec<Vec<char>>,
-    steps: usize,
+    loops: bool,
 }
 
 impl Guard {
     fn new(map: Vec<Vec<char>>) -> Self {
         let start_pos = Self::find_start_pos(&map);
-        let mut visited = vec![vec![false; map[0].len()]; map.len()];
-        visited[start_pos.y as usize][start_pos.x as usize] = true;
+        let mut visited: HashSet<(Coordinate, Direction)> = HashSet::new();
+        visited.insert(((start_pos.clone()), Direction::North));
         Guard {
             position: start_pos,
             direction: Direction::North,
             visited,
             map,
-            steps: 0,
+            loops: false,
         }
     }
 
@@ -109,15 +111,32 @@ impl Guard {
             Tile::Object => self.rotate(),
             Tile::Free => {
                 self.position = self.get_next_position(&self.direction);
-                self.visited[self.position.y as usize][self.position.x as usize] = true;
-                self.steps += 1;
+                if !self
+                    .visited
+                    .insert(((self.position.clone()), self.direction.clone()))
+                {
+                    self.loops = true;
+                    return false;
+                }
             }
         }
         true
     }
 
     fn get_unique_tiles(self) -> usize {
-        self.visited.iter().flatten().filter(|&&val| val).count()
+        self.visited
+            .iter()
+            .map(|vis| vis.0.clone())
+            .collect::<HashSet<Coordinate>>()
+            .iter()
+            .count()
+    }
+
+    fn reset(&mut self, start_pos: Coordinate, start_dir: Direction) {
+        self.position = start_pos;
+        self.direction = start_dir;
+        self.visited.clear();
+        self.loops = false;
     }
 
     fn step2(&mut self) -> usize {
@@ -137,14 +156,14 @@ impl Guard {
                         self.map[rock_pos.y as usize][rock_pos.x as usize] = '#';
                         rock_placement[rock_pos.y as usize][rock_pos.x as usize] = true;
                         while self.step() {
-                            if self.steps > 100000 {
-                                loops += 1;
-                                self.steps = 0;
-                                break;
-                            }
+                            //
                         }
-                        self.position = start_pos;
-                        self.direction = start_dir;
+
+                        if self.loops {
+                            loops += 1;
+                        }
+
+                        self.reset(start_pos, start_dir);
                         self.map[rock_pos.y as usize][rock_pos.x as usize] = '.';
                     }
                 }
