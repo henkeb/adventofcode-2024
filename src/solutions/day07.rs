@@ -56,17 +56,32 @@ pub fn puzzle_2(input: &str) -> String {
 
     sums_nums
         .iter()
-        .fold(0, |acc, (sum, nums)| {
-            let tries = nums
+        .fold(0, |acc, (calc, nums)| {
+            let calculations = nums
                 .iter()
                 .skip(1)
                 .fold(HashSet::from([nums[0]]), |acc, num| {
                     acc.into_iter()
-                        .flat_map(|prev| [prev + num, prev * num, conc(prev, *num)])
+                        .flat_map(|prev| {
+                            let mut outp: Vec<usize> = Vec::new();
+                            let add = prev + num;
+                            let mul = prev * num;
+                            let con = conc(prev, *num);
+                            if add <= *calc {
+                                outp.push(add);
+                            }
+                            if mul <= *calc {
+                                outp.push(mul);
+                            }
+                            if con <= *calc {
+                                outp.push(con);
+                            }
+                            outp
+                        })
                         .collect()
                 });
-            if tries.contains(&sum) {
-                acc + sum
+            if calculations.contains(&calc) {
+                acc + calc
             } else {
                 acc
             }
