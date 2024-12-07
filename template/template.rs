@@ -1,15 +1,15 @@
-// Solution has
-// Time complexity: O(?)
-// Space complexity: O(?)
 pub fn puzzle_1(input: &str) -> String {
+    let _ = handle_input(input);
     "Not implemented yet!".to_string()
 }
 
-// Solution has
-// Time complexity: O(?)
-// Space complexity: O(?)
 pub fn puzzle_2(input: &str) -> String {
+    let _ = handle_input(input);
     "Not implemented yet!".to_string()
+}
+
+fn handle_input(input: &str) -> () {
+    unimplemented!()
 }
 
 #[cfg(test)]
