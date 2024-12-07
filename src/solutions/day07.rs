@@ -56,7 +56,7 @@ pub fn puzzle_2(input: &str) -> String {
 
     sums_nums
         .iter()
-        .fold(0, |acc, (calc, nums)| {
+        .fold(0, |acc, (target, nums)| {
             let calculations = nums
                 .iter()
                 .skip(1)
@@ -67,21 +67,21 @@ pub fn puzzle_2(input: &str) -> String {
                             let add = prev + num;
                             let mul = prev * num;
                             let con = conc(prev, *num);
-                            if add <= *calc {
+                            if add <= *target {
                                 outp.push(add);
                             }
-                            if mul <= *calc {
+                            if mul <= *target {
                                 outp.push(mul);
                             }
-                            if con <= *calc {
+                            if con <= *target {
                                 outp.push(con);
                             }
                             outp
                         })
                         .collect()
                 });
-            if calculations.contains(&calc) {
-                acc + calc
+            if calculations.contains(&target) {
+                acc + target
             } else {
                 acc
             }
