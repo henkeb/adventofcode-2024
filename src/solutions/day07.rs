@@ -51,25 +51,27 @@ pub fn puzzle_1(input: &str) -> String {
 // Space complexity: O(?)
 pub fn puzzle_2(input: &str) -> String {
     let sums_nums = parse_input(input);
-    let mut total = 0;
 
     let conc = |a: usize, b: usize| str::parse::<usize>(&format!("{a}{b}")).unwrap();
 
-    for (sum, nums) in sums_nums.iter() {
-        let first_num = nums[0];
-        let tries = nums
-            .iter()
-            .skip(1)
-            .fold(HashSet::from([first_num]), |acc, num| {
-                acc.into_iter()
-                    .flat_map(|prev| [prev + num, prev * num, conc(prev, *num)])
-                    .collect()
-            });
-        if tries.contains(&sum) {
-            total += sum;
-        }
-    }
-    total.to_string()
+    sums_nums
+        .iter()
+        .fold(0, |acc, (sum, nums)| {
+            let tries = nums
+                .iter()
+                .skip(1)
+                .fold(HashSet::from([nums[0]]), |acc, num| {
+                    acc.into_iter()
+                        .flat_map(|prev| [prev + num, prev * num, conc(prev, *num)])
+                        .collect()
+                });
+            if tries.contains(&sum) {
+                acc + sum
+            } else {
+                acc
+            }
+        })
+        .to_string()
 }
 
 #[cfg(test)]
