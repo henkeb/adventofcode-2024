@@ -19,10 +19,9 @@ pub fn puzzle_1(input: &str) -> String {
 
 pub fn puzzle_2(input: &str) -> String {
     let (mut memory, mut id_to_move) = handle_input(input);
-    let mut _right_start = memory.len() - 1;
-    let mut right_end = memory.len() - 1;
-
+    let (mut _right_start, mut right_end) = (memory.len() - 1, memory.len() - 1);
     let mut free_memory = get_free_memory_blocks(&memory);
+
     while id_to_move != 0 {
         while memory[right_end] == None {
             right_end -= 1;
@@ -32,7 +31,9 @@ pub fn puzzle_2(input: &str) -> String {
         while memory[_right_start] != None && memory[_right_start].unwrap() == current_id {
             _right_start -= 1;
         }
-        _right_start += 1;
+
+        _right_start += 1; // compensate index in previous while loop
+
         if id_to_move == memory[right_end].unwrap() {
             id_to_move -= 1;
             for mem in free_memory.iter_mut() {
@@ -52,6 +53,7 @@ pub fn puzzle_2(input: &str) -> String {
                 }
             }
         }
+        // set end range to where previous started - 1
         right_end = _right_start - 1;
     }
     calculate_checksum(&memory).to_string()
@@ -81,16 +83,12 @@ fn get_free_memory_blocks(memory: &Vec<Option<usize>>) -> Vec<(usize, usize)> {
 }
 
 fn calculate_checksum(memory: &Vec<Option<usize>>) -> usize {
-    let mut output = 0;
-    for (i, val) in memory
+    memory
         .iter()
         .enumerate()
         .filter(|(_i, val)| val.is_some())
         .map(|(i, val)| (i, val.unwrap()))
-    {
-        output += i * val;
-    }
-    output
+        .fold(0, |acc, (i, val)| acc + i * val)
 }
 
 fn handle_input(input: &str) -> (Vec<Option<usize>>, usize) {
