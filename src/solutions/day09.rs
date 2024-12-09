@@ -1,5 +1,5 @@
 pub fn puzzle_1(input: &str) -> String {
-    let mut memory = handle_input(input);
+    let (mut memory, _) = handle_input(input);
     let mut left = 0;
     let mut right = memory.len() - 1;
     while left < right {
@@ -18,12 +18,15 @@ pub fn puzzle_1(input: &str) -> String {
 }
 
 pub fn puzzle_2(input: &str) -> String {
-    let mut memory = handle_input(input);
+    let (mut memory, mut max_id) = handle_input(input);
     let mut _right_start = memory.len() - 1;
     let mut right_end = memory.len() - 1;
 
     let mut free_memory = get_free_memory_blocks(&memory);
     while right_end > free_memory[0].0 {
+        if max_id == 0 {
+            break;
+        }
         while memory[right_end] == None {
             right_end -= 1;
         }
@@ -33,19 +36,22 @@ pub fn puzzle_2(input: &str) -> String {
             _right_start -= 1;
         }
         _right_start += 1;
-        for mem in free_memory.iter_mut() {
-            if mem.0 > mem.1 {
-                continue;
-            }
-            let free = mem.1 - mem.0 + 1;
-            let curr = right_end - _right_start + 1;
-            if free >= curr {
-                if _right_start > mem.0 {
-                    for (i, j) in (_right_start..=right_end).enumerate() {
-                        memory.swap(mem.0 + i, j);
+        if max_id == memory[right_end].unwrap() {
+            max_id -= 1;
+            for mem in free_memory.iter_mut() {
+                if mem.0 > mem.1 {
+                    continue;
+                }
+                let free = mem.1 - mem.0 + 1;
+                let curr = right_end - _right_start + 1;
+                if free >= curr {
+                    if _right_start > mem.0 {
+                        for (i, j) in (_right_start..=right_end).enumerate() {
+                            memory.swap(mem.0 + i, j);
+                        }
+                        mem.0 += curr;
+                        break;
                     }
-                    mem.0 += curr;
-                    break;
                 }
             }
         }
@@ -90,7 +96,7 @@ fn calculate_checksum(memory: &Vec<Option<usize>>) -> usize {
     output
 }
 
-fn handle_input(input: &str) -> Vec<Option<usize>> {
+fn handle_input(input: &str) -> (Vec<Option<usize>>, usize) {
     let mut memory: Vec<Option<usize>> = Vec::new();
     let mut id = 0;
     for (i, val) in input
@@ -110,7 +116,10 @@ fn handle_input(input: &str) -> Vec<Option<usize>> {
             }
         }
     }
-    memory
+    if let Some(_id_last) = memory.iter().last() {
+        id -= 1;
+    }
+    (memory, id)
 }
 
 #[cfg(test)]
