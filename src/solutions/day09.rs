@@ -18,26 +18,23 @@ pub fn puzzle_1(input: &str) -> String {
 }
 
 pub fn puzzle_2(input: &str) -> String {
-    let (mut memory, mut max_id) = handle_input(input);
+    let (mut memory, mut id_to_move) = handle_input(input);
     let mut _right_start = memory.len() - 1;
     let mut right_end = memory.len() - 1;
 
     let mut free_memory = get_free_memory_blocks(&memory);
-    while right_end > free_memory[0].0 {
-        if max_id == 0 {
-            break;
-        }
+    while id_to_move != 0 {
         while memory[right_end] == None {
             right_end -= 1;
         }
-        let id = memory[right_end].unwrap();
+        let current_id = memory[right_end].unwrap();
         _right_start = right_end;
-        while memory[_right_start] != None && memory[_right_start].unwrap() == id {
+        while memory[_right_start] != None && memory[_right_start].unwrap() == current_id {
             _right_start -= 1;
         }
         _right_start += 1;
-        if max_id == memory[right_end].unwrap() {
-            max_id -= 1;
+        if id_to_move == memory[right_end].unwrap() {
+            id_to_move -= 1;
             for mem in free_memory.iter_mut() {
                 if mem.0 > mem.1 {
                     continue;
