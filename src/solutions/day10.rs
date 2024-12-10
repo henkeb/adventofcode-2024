@@ -79,11 +79,7 @@ fn handle_input(input: &str) -> (Vec<Vec<usize>>, (isize, isize)) {
     for (y, row) in input.lines().enumerate() {
         output.push(vec![]);
         for (_, ch) in row.chars().enumerate() {
-            if ch == '.' {
-                output[y].push(11);
-            } else {
-                output[y].push(ch as usize - '0' as usize);
-            }
+            output[y].push(ch as usize - '0' as usize);
         }
     }
     let x_len = output[0].len() as isize;
@@ -120,23 +116,7 @@ mod tests {
     }
 
     #[test]
-    fn test_2a() {
-        assert_eq!(
-            puzzle_2(
-                ".....0.
-..4321.
-..5..2.
-..6543.
-..7..4.
-..8765.
-..9...."
-            ),
-            "3"
-        );
-    }
-
-    #[test]
-    fn test_2b() {
+    fn test_2() {
         assert_eq!(puzzle_2(&INPUT2), "81");
     }
 }
