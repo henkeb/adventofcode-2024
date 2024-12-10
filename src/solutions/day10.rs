@@ -1,32 +1,37 @@
 use std::collections::HashMap;
 
 const DIRECTION: [(isize, isize); 4] = [(-1, 0), (1, 0), (0, 1), (0, -1)];
+
 pub fn puzzle_1(input: &str) -> String {
     let (map, max_len) = handle_input(input);
-    let mut count = 0;
-    for (y, row) in map.iter().enumerate() {
-        for (x, num) in row.iter().enumerate() {
-            if *num == 0 {
-                count += dfs(&map, &max_len, &(x as isize, y as isize), false);
-            }
-        }
-    }
-
-    count.to_string()
+    map.iter()
+        .enumerate()
+        .fold(0, |acc, (y, row)| {
+            acc + row.iter().enumerate().fold(0, |acc, (x, num)| {
+                if *num == 0 {
+                    acc + dfs(&map, &max_len, &(x as isize, y as isize), false)
+                } else {
+                    acc
+                }
+            })
+        })
+        .to_string()
 }
 
 pub fn puzzle_2(input: &str) -> String {
     let (map, max_len) = handle_input(input);
-    let mut count = 0;
-    for (y, row) in map.iter().enumerate() {
-        for (x, num) in row.iter().enumerate() {
-            if *num == 0 {
-                count += dfs(&map, &max_len, &(x as isize, y as isize), true);
-            }
-        }
-    }
-
-    count.to_string()
+    map.iter()
+        .enumerate()
+        .fold(0, |acc, (y, row)| {
+            acc + row.iter().enumerate().fold(0, |acc, (x, num)| {
+                if *num == 0 {
+                    acc + dfs(&map, &max_len, &(x as isize, y as isize), true)
+                } else {
+                    acc
+                }
+            })
+        })
+        .to_string()
 }
 
 fn dfs(
@@ -43,12 +48,15 @@ fn dfs(
         }
         false
     };
+
     let mut found_tippeditops: HashMap<(isize, isize), usize> = HashMap::new();
     let mut queue: Vec<((isize, isize), usize)> = Vec::new();
     queue.push(((*start_pos), 0));
+
     while let Some((pos, gradient)) = queue.pop() {
         for dir in DIRECTION.iter() {
             let new_pos = (pos.0 + dir.0, pos.1 + dir.1);
+
             if !check_bounds(new_pos, *max_len) {
                 continue;
             }
@@ -67,6 +75,7 @@ fn dfs(
             }
         }
     }
+
     if unique_trainheads {
         found_tippeditops.iter().map(|(_, value)| value).sum()
     } else {
