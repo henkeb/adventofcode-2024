@@ -38,7 +38,7 @@ fn dfs(
     map: &Vec<Vec<usize>>,
     max_len: &(isize, isize),
     start_pos: &(isize, isize),
-    unique_trainheads: bool,
+    unique_trailheads: bool,
 ) -> usize {
     let check_bounds = |a: (isize, isize), b: (isize, isize)| -> bool {
         if a.0 >= 0 && a.0 < b.0 {
@@ -76,7 +76,7 @@ fn dfs(
         }
     }
 
-    if unique_trainheads {
+    if unique_trailheads {
         found_tippeditops.iter().map(|(_, value)| value).sum()
     } else {
         found_tippeditops.iter().count()
