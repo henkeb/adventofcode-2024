@@ -1,70 +1,56 @@
 use std::collections::HashMap;
 
 pub fn puzzle_1(input: &str) -> String {
-    let mut stones = handle_input(input);
-
-    for _ in 0..25 {
-        stones = update_stones(&stones);
-    }
-
-    stones.values().sum::<usize>().to_string()
+    (0..25)
+        .fold(handle_input(input), |stones, _| update_stones(&stones))
+        .values()
+        .sum::<usize>()
+        .to_string()
 }
 
 pub fn puzzle_2(input: &str) -> String {
-    let mut stones = handle_input(input);
-
-    for _ in 0..75 {
-        stones = update_stones(&stones);
-    }
-
-    stones.values().sum::<usize>().to_string()
+    (0..75)
+        .fold(handle_input(input), |stones, _| update_stones(&stones))
+        .values()
+        .sum::<usize>()
+        .to_string()
 }
 
 fn update_stones(stones: &HashMap<usize, usize>) -> HashMap<usize, usize> {
     let mut new_stones: HashMap<usize, usize> = HashMap::with_capacity(stones.len());
+    let mod_map = |stones: &mut HashMap<usize, usize>, key: &usize, val: &usize| {
+        stones
+            .entry(*key)
+            .and_modify(|prev| *prev += val)
+            .or_insert(*val);
+    };
     for (stone, count) in stones.iter() {
         if *stone == 0 {
-            new_stones
-                .entry(1)
-                .and_modify(|prev| *prev += count)
-                .or_insert(*count);
-        } else if count_digits(stone) & 1 == 0 {
+            mod_map(&mut new_stones, &1, count);
+        } else if (stone.ilog10() + 1) & 1 == 0 {
             let stone_str = stone.to_string();
             let (left, right) = stone_str.split_at(stone_str.len() / 2);
-            new_stones
-                .entry(left.parse().unwrap())
-                .and_modify(|prev| *prev += count)
-                .or_insert(*count);
-            new_stones
-                .entry(right.parse().unwrap())
-                .and_modify(|prev| *prev += count)
-                .or_insert(*count);
+            if let (Some(left), Some(right)) = (left.parse().ok(), right.parse().ok()) {
+                mod_map(&mut new_stones, &left, count);
+                mod_map(&mut new_stones, &right, count);
+            }
         } else {
-            new_stones
-                .entry(*stone * 2024)
-                .and_modify(|prev| *prev += count)
-                .or_insert(*count);
+            mod_map(&mut new_stones, &(*stone * 2024), count);
         }
     }
     new_stones
 }
 
-fn count_digits(number: &usize) -> usize {
-    let mut digits = 0;
-    let mut temp_num = number.clone();
-    while temp_num > 0 {
-        digits += 1;
-        temp_num /= 10;
-    }
-    digits
-}
-
 fn handle_input(input: &str) -> HashMap<usize, usize> {
+    let mut output: HashMap<usize, usize> = HashMap::new();
     input
         .trim()
         .split_whitespace()
-        .map(|val| (val.parse().unwrap(), 1))
-        .collect()
+        .filter_map(|val| val.parse::<usize>().ok())
+        .for_each(|val| {
+            output.entry(val).and_modify(|prev| *prev += 1).or_insert(1);
+        });
+    output
 }
 
 #[cfg(test)]
@@ -76,10 +62,5 @@ mod tests {
     #[test]
     fn test_1() {
         assert_eq!(puzzle_1(&INPUT), "55312");
-    }
-
-    #[test]
-    fn test_2() {
-        assert_eq!(puzzle_2(&INPUT), "");
     }
 }
