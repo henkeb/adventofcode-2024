@@ -18,24 +18,24 @@ pub fn puzzle_2(input: &str) -> String {
 
 fn update_stones(stones: &HashMap<usize, usize>) -> HashMap<usize, usize> {
     let mut new_stones: HashMap<usize, usize> = HashMap::with_capacity(stones.len());
-    let mod_map = |stones: &mut HashMap<usize, usize>, key: &usize, val: &usize| {
+    let modify_stones = |stones: &mut HashMap<usize, usize>, new_stone: &usize, count: &usize| {
         stones
-            .entry(*key)
-            .and_modify(|prev| *prev += val)
-            .or_insert(*val);
+            .entry(*new_stone)
+            .and_modify(|prev_stone| *prev_stone += count)
+            .or_insert(*count);
     };
     for (stone, count) in stones.iter() {
         if *stone == 0 {
-            mod_map(&mut new_stones, &1, count);
+            modify_stones(&mut new_stones, &1, count);
         } else if (stone.ilog10() + 1) & 1 == 0 {
             let stone_str = stone.to_string();
             let (left, right) = stone_str.split_at(stone_str.len() / 2);
             if let (Some(left), Some(right)) = (left.parse().ok(), right.parse().ok()) {
-                mod_map(&mut new_stones, &left, count);
-                mod_map(&mut new_stones, &right, count);
+                modify_stones(&mut new_stones, &left, count);
+                modify_stones(&mut new_stones, &right, count);
             }
         } else {
-            mod_map(&mut new_stones, &(*stone * 2024), count);
+            modify_stones(&mut new_stones, &(*stone * 2024), count);
         }
     }
     new_stones
@@ -46,9 +46,12 @@ fn handle_input(input: &str) -> HashMap<usize, usize> {
     input
         .trim()
         .split_whitespace()
-        .filter_map(|val| val.parse::<usize>().ok())
-        .for_each(|val| {
-            output.entry(val).and_modify(|prev| *prev += 1).or_insert(1);
+        .filter_map(|stone| stone.parse::<usize>().ok())
+        .for_each(|stone| {
+            output
+                .entry(stone)
+                .and_modify(|prev_stone| *prev_stone += 1)
+                .or_insert(1);
         });
     output
 }
