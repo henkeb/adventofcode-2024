@@ -60,11 +60,8 @@ fn calculate_fence_cost_with_discount(
     let plants_hset: HashSet<(usize, usize)> =
         HashSet::from_iter(points.iter().map(|plants| plants.0));
 
-    // check in y_direction
-    // let mut check_y = HashSet::new();
     let up_down: [(isize, isize); 2] = [(0, 1), (0, -1)];
     let left_right: [(isize, isize); 2] = [(-1, 0), (1, 0)];
-    // left side
     let mut visited_left = HashSet::new();
     let mut visited_right = HashSet::new();
     let mut visited_up = HashSet::new();
