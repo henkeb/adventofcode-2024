@@ -1,7 +1,7 @@
 use std::io::Write;
 use std::{error::Error, fs, io::BufRead, path::Path};
 
-use solutions::day11;
+use solutions::day12;
 
 #[allow(dead_code)]
 mod solutions;
@@ -23,8 +23,8 @@ fn main() -> Result<(), Box<dyn Error>> {
                 get_input(day)?;
                 add_mod(day)?;
             } else {
-                println!("Puzzle 1: {}", day11::puzzle_1(&get_input(day)?));
-                println!("Puzzle 2: {}", day11::puzzle_2(&get_input(day)?));
+                println!("Puzzle 1: {}", day12::puzzle_1(&get_input(day)?));
+                println!("Puzzle 2: {}", day12::puzzle_2(&get_input(day)?));
             }
         }
         _ => println!("Wrong input!"),

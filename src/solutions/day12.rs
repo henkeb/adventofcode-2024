@@ -65,24 +65,24 @@ fn calculate_fence_cost_with_discount(
     let up_down: [(isize, isize); 2] = [(0, 1), (0, -1)];
     let left_right: [(isize, isize); 2] = [(-1, 0), (1, 0)];
     // left side
-    let mut visited = HashSet::new();
-    let mut visited_updown = HashSet::new();
+    let mut visited_left = HashSet::new();
+    let mut visited_right = HashSet::new();
+    let mut visited_up = HashSet::new();
+    let mut visited_down = HashSet::new();
     let mut left_set = HashSet::new();
     let mut right_set = HashSet::new();
     let mut up_set = HashSet::new();
     let mut down_set = HashSet::new();
-    let (mut left_count, mut right_count, mut up_count, mut down_count) = (0, 0, 0, 0);
     for (point, &plant) in points.iter() {
         left_set.clear();
-        right_set.clear();
         let mut queue: Vec<(usize, usize)> = Vec::new();
         queue.push(*point);
         while let Some(point) = queue.pop() {
-            if visited.contains(&point) {
-                println!("visited point: {point:?}");
+            if visited_left.contains(&point) {
                 continue;
             }
-            visited.insert(point);
+            let mut search_up_down = false;
+            visited_left.insert(point);
             if check_bounds(&point, (-1, 0), max_len) {
                 let new_point = (
                     (point.0 as isize + -1) as usize,
@@ -90,10 +90,38 @@ fn calculate_fence_cost_with_discount(
                 );
                 if !plants_hset.contains(&new_point) {
                     left_set.insert(point);
+                    search_up_down = true;
                 }
             } else {
                 left_set.insert(point);
+                search_up_down = true;
             }
+            if search_up_down {
+                for dir in up_down.iter() {
+                    if check_bounds(&point, *dir, max_len) {
+                        let new_point = (
+                            (point.0 as isize + dir.0) as usize,
+                            (point.1 as isize + dir.1) as usize,
+                        );
+                        if map[new_point.1][new_point.0] == plant {
+                            queue.push(new_point.clone());
+                        }
+                    }
+                }
+            }
+        }
+        if !left_set.is_empty() {
+            total_sides += 1;
+        }
+
+        right_set.clear();
+        queue.push(*point);
+        while let Some(point) = queue.pop() {
+            if visited_right.contains(&point) {
+                continue;
+            }
+            let mut search_up_down = false;
+            visited_right.insert(point);
             if check_bounds(&point, (1, 0), max_len) {
                 let new_point = (
                     (point.0 as isize + 1) as usize,
@@ -101,40 +129,39 @@ fn calculate_fence_cost_with_discount(
                 );
                 if !plants_hset.contains(&new_point) {
                     right_set.insert(point);
+                    search_up_down = true;
                 }
             } else {
                 right_set.insert(point);
+                search_up_down = true;
             }
-            for dir in up_down.iter() {
-                if check_bounds(&point, *dir, max_len) {
-                    let new_point = (
-                        (point.0 as isize + dir.0) as usize,
-                        (point.1 as isize + dir.1) as usize,
-                    );
-                    if map[new_point.1][new_point.0] == plant {
-                        queue.push(new_point.clone());
+            if search_up_down {
+                for dir in up_down.iter() {
+                    if check_bounds(&point, *dir, max_len) {
+                        let new_point = (
+                            (point.0 as isize + dir.0) as usize,
+                            (point.1 as isize + dir.1) as usize,
+                        );
+                        if map[new_point.1][new_point.0] == plant {
+                            queue.push(new_point.clone());
+                        }
                     }
                 }
             }
         }
-        if !left_set.is_empty() {
-            left_count += 1;
-            total_sides += 1;
-        }
+
         if !right_set.is_empty() {
-            println!("Right count incremented by pos {point:?}, plant {plant}");
-            right_count += 1;
             total_sides += 1;
         }
-        queue.clear();
+
         up_set.clear();
-        down_set.clear();
         queue.push(*point);
         while let Some(point) = queue.pop() {
-            if visited_updown.contains(&point) {
+            if visited_up.contains(&point) {
                 continue;
             }
-            visited_updown.insert(point);
+            let mut search_left_right = false;
+            visited_up.insert(point);
             if check_bounds(&point, (0, -1), max_len) {
                 let new_point = (
                     (point.0 as isize + 0) as usize,
@@ -142,10 +169,34 @@ fn calculate_fence_cost_with_discount(
                 );
                 if !plants_hset.contains(&new_point) {
                     up_set.insert(point);
+                    search_left_right = true;
                 }
             } else {
                 up_set.insert(point);
+                search_left_right = true;
             }
+            if search_left_right {
+                for dir in left_right.iter() {
+                    if check_bounds(&point, *dir, max_len) {
+                        let new_point = (
+                            (point.0 as isize + dir.0) as usize,
+                            (point.1 as isize + dir.1) as usize,
+                        );
+                        if map[new_point.1][new_point.0] == plant {
+                            queue.push(new_point.clone());
+                        }
+                    }
+                }
+            }
+        }
+        down_set.clear();
+        queue.push(*point);
+        while let Some(point) = queue.pop() {
+            if visited_down.contains(&point) {
+                continue;
+            }
+            let mut search_left_right = false;
+            visited_down.insert(point);
             if check_bounds(&point, (0, 1), max_len) {
                 let new_point = (
                     (point.0 as isize + 0) as usize,
@@ -153,35 +204,33 @@ fn calculate_fence_cost_with_discount(
                 );
                 if !plants_hset.contains(&new_point) {
                     down_set.insert(point);
+                    search_left_right = true;
                 }
             } else {
                 down_set.insert(point);
+                search_left_right = true;
             }
-            for dir in left_right.iter() {
-                if check_bounds(&point, *dir, max_len) {
-                    let new_point = (
-                        (point.0 as isize + dir.0) as usize,
-                        (point.1 as isize + dir.1) as usize,
-                    );
-                    if map[new_point.1][new_point.0] == plant {
-                        queue.push(new_point.clone());
+            if search_left_right {
+                for dir in left_right.iter() {
+                    if check_bounds(&point, *dir, max_len) {
+                        let new_point = (
+                            (point.0 as isize + dir.0) as usize,
+                            (point.1 as isize + dir.1) as usize,
+                        );
+                        if map[new_point.1][new_point.0] == plant {
+                            queue.push(new_point.clone());
+                        }
                     }
                 }
             }
         }
-        // println!("down set: {down_set:?}");
-        // println!("up set: {up_set:?}");
         if !down_set.is_empty() {
-            down_count += 1;
             total_sides += 1;
         }
         if !up_set.is_empty() {
-            up_count += 1;
             total_sides += 1;
         }
-        // println!("total_sides {total_sides} for {}", plant);
     }
-    println!("left {left_count}, right {right_count}, up {up_count}, down {down_count}");
     total_sides * points.len()
 }
 
