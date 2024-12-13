@@ -79,13 +79,13 @@ fn handle_input(input: &str, has_conversion_error: bool) -> Vec<ClawGame> {
                 results.push((x.parse::<isize>().unwrap(), y.parse::<isize>().unwrap()));
             }
         }
-        let mut prize = (results[2].clone().0, results[2].clone().1);
+        let mut prize = (results[2].0, results[2].1);
         if has_conversion_error {
             prize = (prize.0 + 10000000000000, prize.1 + 10000000000000);
         }
         output.push(ClawGame {
-            button_a: (results[0].clone().0, results[0].clone().1),
-            button_b: (results[1].clone().0, results[1].clone().1),
+            button_a: (results[0].0, results[0].1),
+            button_b: (results[1].0, results[1].1),
             prize,
         });
     });
@@ -122,10 +122,5 @@ Prize: X=18641, Y=10279";
     #[test]
     fn test_1() {
         assert_eq!(puzzle_1(&INPUT), "480");
-    }
-
-    #[test]
-    fn test_2() {
-        assert_eq!(puzzle_2(&INPUT), "");
     }
 }
