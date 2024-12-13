@@ -34,22 +34,21 @@ pub fn puzzle_2(input: &str) -> String {
         if determinant == 0 {
             continue;
         }
-        // Calculate det(A_2)/det(A) button_b pushes
-        let n = (claw_game.prize.1 * claw_game.button_a.0
+        // Calculate det(A_1)/det(A)
+        let a = (claw_game.prize.0 * claw_game.button_b.1
+            - claw_game.prize.1 * claw_game.button_b.0)
+            / determinant;
+
+        // Calculate det(A_2)/det(A)
+        let b = (claw_game.prize.1 * claw_game.button_a.0
             - claw_game.prize.0 * claw_game.button_a.1)
             / determinant;
 
-        // Calculate button_a pushes using button_b linear dependency
-        let m = (claw_game.prize.0 - n * claw_game.button_b.0) / claw_game.button_a.0;
-
-        // Get positive solutions (we cant have negative presses) and solution that matches the
-        // prize location.
-        if m >= 0
-            && n >= 0
-            && m * claw_game.button_a.0 + n * claw_game.button_b.0 == claw_game.prize.0
-            && m * claw_game.button_a.1 + n * claw_game.button_b.1 == claw_game.prize.1
+        // Check that the solution adds upp to the price
+        if claw_game.button_a.0 * a + claw_game.button_b.0 * b == claw_game.prize.0
+            && claw_game.button_a.1 * a + claw_game.button_b.1 * b == claw_game.prize.1
         {
-            output += m * 3 + n;
+            output += 3 * a + b;
         }
     }
     output.to_string()
