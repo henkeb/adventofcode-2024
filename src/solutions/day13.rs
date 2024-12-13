@@ -26,28 +26,39 @@ pub fn puzzle_1(input: &str) -> String {
 pub fn puzzle_2(input: &str) -> String {
     let claw_games = handle_input(input, true);
     let mut output = 0;
+    // Solve using Cramers rule and linear dependency as seen in puzzle_1
     for claw_game in claw_games.iter() {
-        let mut button_presses = linear_solutions(
-            claw_game.button_a.0,
-            claw_game.button_b.0,
-            claw_game.prize.0,
-        );
-        button_presses.sort_unstable_by(|a, b| b.1.cmp(&a.1));
-        for presses in button_presses.iter() {
-            if presses.0 * claw_game.button_a.1 + presses.1 * claw_game.button_b.1
-                == claw_game.prize.1
-            {
-                output += presses.0 * 3 + presses.1 * 1;
-                break;
-            }
+        // Calculate det(A)
+        let determinant = claw_game.button_a.0 * claw_game.button_b.1
+            - claw_game.button_b.0 * claw_game.button_a.1;
+        if determinant == 0 {
+            continue;
+        }
+        // Calculate det(A_2)/det(A) button_b pushes
+        let n = (claw_game.prize.1 * claw_game.button_a.0
+            - claw_game.prize.0 * claw_game.button_a.1)
+            / determinant;
+
+        // Calculate button_a pushes using button_b linear dependency
+        let m = (claw_game.prize.0 - n * claw_game.button_b.0) / claw_game.button_a.0;
+
+        // Get positive solutions (we cant have negative presses) and solution that matches the
+        // prize location.
+        if m >= 0
+            && n >= 0
+            && m * claw_game.button_a.0 + n * claw_game.button_b.0 == claw_game.prize.0
+            && m * claw_game.button_a.1 + n * claw_game.button_b.1 == claw_game.prize.1
+        {
+            output += m * 3 + n;
         }
     }
     output.to_string()
 }
-fn linear_solutions(n: usize, m: usize, constant: usize) -> Vec<(usize, usize)> {
+
+fn linear_solutions(n: isize, m: isize, constant: isize) -> Vec<(isize, isize)> {
     let mut solutions = Vec::new();
-    for y in 0..100000000 {
-        if !(constant as isize - m as isize * y as isize).is_positive() {
+    for y in 0..100 {
+        if !(constant - m * y).is_positive() {
             continue;
         }
         let remainder = (constant - m * y) % n;
@@ -65,7 +76,7 @@ fn handle_input(input: &str, has_conversion_error: bool) -> Vec<ClawGame> {
         let mut results = vec![];
         for ele in group.lines() {
             for (_, [x, y]) in re.captures_iter(ele).map(|c| c.extract()) {
-                results.push((x.parse::<usize>().unwrap(), y.parse::<usize>().unwrap()));
+                results.push((x.parse::<isize>().unwrap(), y.parse::<isize>().unwrap()));
             }
         }
         let mut prize = (results[2].clone().0, results[2].clone().1);
@@ -83,9 +94,9 @@ fn handle_input(input: &str, has_conversion_error: bool) -> Vec<ClawGame> {
 
 #[derive(Debug)]
 struct ClawGame {
-    button_a: (usize, usize),
-    button_b: (usize, usize),
-    prize: (usize, usize),
+    button_a: (isize, isize),
+    button_b: (isize, isize),
+    prize: (isize, isize),
 }
 
 #[cfg(test)]
