@@ -146,7 +146,6 @@ fn calculate_fence_cost_with_discount(
                 }
             }
         }
-
         if !right_set.is_empty() {
             total_sides += 1;
         }
@@ -186,6 +185,10 @@ fn calculate_fence_cost_with_discount(
                 }
             }
         }
+        if !up_set.is_empty() {
+            total_sides += 1;
+        }
+
         down_set.clear();
         queue.push(*point);
         while let Some(point) = queue.pop() {
@@ -222,9 +225,6 @@ fn calculate_fence_cost_with_discount(
             }
         }
         if !down_set.is_empty() {
-            total_sides += 1;
-        }
-        if !up_set.is_empty() {
             total_sides += 1;
         }
     }
