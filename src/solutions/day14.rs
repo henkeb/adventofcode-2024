@@ -73,7 +73,7 @@ pub fn puzzle_2(input: &str) -> String {
     let mut robots = handle_input(input, 0, max_len);
     let mut robot_map: Vec<Vec<char>> = vec![vec!['.'; max_len.0 as usize]; max_len.1 as usize];
     for _i in 0..=7000 {
-        // println!("NEW TREE HERE loop {i}: \n\n",);
+        // println!("NEW TREE HERE loop {_i}: \n\n",);
         // display_tree(&robot_map);
         // println!("\n\n");
         for robot in robots.iter_mut() {
@@ -89,13 +89,10 @@ pub fn puzzle_2(input: &str) -> String {
             if robot.position.1.is_negative() {
                 robot.position.1 += max_len.1;
             }
-            if robot.position.0 >= max_len.0 {
-                robot.position.0 -= max_len.0;
-            }
             robot_map[robot.position.1 as usize][robot.position.0 as usize] = 'X';
         }
     }
-    "Not implemented yet!".to_string()
+    "No puzzle output".to_string()
 }
 
 fn display_tree(robot_map: &Vec<Vec<char>>) {
@@ -122,8 +119,10 @@ fn handle_input(input: &str, seconds: isize, max_len: (isize, isize)) -> Vec<Rob
             let mut y: isize = y.parse().unwrap();
             let v_x: isize = v_x.parse().unwrap();
             let v_y: isize = v_y.parse().unwrap();
+
             x = (x + v_x * seconds) % max_len.0;
             y = (y + v_y * seconds) % max_len.1;
+
             if x.is_negative() {
                 x += max_len.0;
             }
