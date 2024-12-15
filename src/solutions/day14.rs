@@ -36,8 +36,8 @@
 // ......................................................................................X..............
 use regex::Regex;
 pub fn puzzle_1(input: &str) -> String {
-    let max_len_test = (101, 103);
-    // let max_len_test = (11, 7);
+    // let max_len_test = (101, 103);
+    let max_len_test = (11, 7);
     let mut robots = handle_input(input, 100, max_len_test);
 
     let mut quadrant_counter: [usize; 4] = [0; 4];
@@ -73,9 +73,9 @@ pub fn puzzle_2(input: &str) -> String {
     let mut robots = handle_input(input, 0, max_len);
     let mut robot_map: Vec<Vec<char>> = vec![vec!['.'; max_len.0 as usize]; max_len.1 as usize];
     for _i in 0..=7000 {
-        // println!("NEW TREE HERE loop {_i}: \n\n",);
-        // display_tree(&robot_map);
-        // println!("\n\n");
+        println!("NEW TREE HERE loop {_i}: \n\n",);
+        display_tree(&robot_map);
+        println!("\n\n");
         for robot in robots.iter_mut() {
             robot_map[robot.position.1 as usize][robot.position.0 as usize] = '.';
             robot.position.0 += robot.velocity.0;
@@ -111,7 +111,7 @@ struct Robot {
 }
 
 fn handle_input(input: &str, seconds: isize, max_len: (isize, isize)) -> Vec<Robot> {
-    let re = Regex::new(r"p=(-?\d*),(-?\d*) v=(-?\d*),(-?\d*)").unwrap();
+    let re = Regex::new(r"p=(-?\d+),(-?\d+) v=(-?\d+),(-?\d+)").unwrap();
     let mut output: Vec<Robot> = Vec::new();
     for line in input.lines() {
         for (_, [x, y, v_x, v_y]) in re.captures_iter(line).map(|c| c.extract()) {
