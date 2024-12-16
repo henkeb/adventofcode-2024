@@ -44,41 +44,28 @@ pub fn puzzle_2(input: &str) -> String {
         if !check_bounds(&new_position, &max_map_len) {
             continue;
         }
-        if *command == Direction::Left || *command == Direction::Right {
-            match map[new_position.1 as usize][new_position.0 as usize] {
-                '.' => (),
-                '#' => continue,
-                '[' | ']' => {
+        match map[new_position.1 as usize][new_position.0 as usize] {
+            '.' => (),
+            '#' => continue,
+            '[' | ']' => {
+                if *command == Direction::Left || *command == Direction::Right {
                     if !move_boxes_if_possible2_left_right(&mut map, command, &new_position) {
                         continue;
                     }
-                }
-                _ => {
-                    dbg!(map[new_position.1 as usize][new_position.0 as usize]);
-                    panic!("Wrong char");
-                }
-            }
-            map[new_position.1 as usize][new_position.0 as usize] = '@';
-            map[position.1 as usize][position.0 as usize] = '.';
-            position = new_position;
-        } else {
-            match map[new_position.1 as usize][new_position.0 as usize] {
-                '.' => (),
-                '#' => continue,
-                '[' | ']' => {
+                } else {
                     if !move_boxes_if_possible_up_down(&mut map, command, &new_position) {
                         continue;
                     }
                 }
-                _ => {
-                    dbg!(map[new_position.1 as usize][new_position.0 as usize]);
-                    panic!("Wrong char");
-                }
             }
-            map[new_position.1 as usize][new_position.0 as usize] = '@';
-            map[position.1 as usize][position.0 as usize] = '.';
-            position = new_position;
+            _ => {
+                dbg!(map[new_position.1 as usize][new_position.0 as usize]);
+                panic!("Wrong char");
+            }
         }
+        map[new_position.1 as usize][new_position.0 as usize] = '@';
+        map[position.1 as usize][position.0 as usize] = '.';
+        position = new_position;
     }
     calculate_gps_coordinates2(&map).to_string()
 }

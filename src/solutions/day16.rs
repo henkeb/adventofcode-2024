@@ -13,17 +13,19 @@ pub fn puzzle_2(input: &str) -> String {
 }
 
 fn bfs_with_cost(map: &mut Vec<Vec<char>>, starting_position: (isize, isize)) -> (usize, usize) {
+    let mut output = usize::max_value();
+    let mut visited: HashMap<(isize, isize), usize> = HashMap::new();
+    let mut best_path: HashSet<(isize, isize)> = HashSet::new();
     let mut queue: VecDeque<((isize, isize), Direction, usize, Vec<(isize, isize)>)> =
         VecDeque::new();
+
     queue.push_back((
         starting_position,
         Direction::East,
         0,
         vec![starting_position],
     ));
-    let mut output = usize::max_value();
-    let mut visited: HashMap<(isize, isize), usize> = HashMap::new();
-    let mut best_path: HashSet<(isize, isize)> = HashSet::new();
+
     while let Some((position, direction, cost, path)) = queue.pop_front() {
         if map[position.1 as usize][position.0 as usize] == '#' {
             continue;
@@ -41,15 +43,18 @@ fn bfs_with_cost(map: &mut Vec<Vec<char>>, starting_position: (isize, isize)) ->
             }
             continue;
         }
+
         if let Some(prev_cost) = visited.get(&position) {
             if cost > *prev_cost + 1000 {
                 continue;
             }
         }
+
         visited
             .entry(position)
             .and_modify(|old_cost| *old_cost = cost)
             .or_insert(cost);
+
         let mut path_same_dir = path.clone();
         path_same_dir.push((
             position.0 + direction.value().0,
@@ -64,7 +69,9 @@ fn bfs_with_cost(map: &mut Vec<Vec<char>>, starting_position: (isize, isize)) ->
             cost + 1,
             path_same_dir,
         ));
+
         let (rotation_1, rotation_2) = direction.rotations();
+
         let mut path_rotation_1 = path.clone();
         path_rotation_1.push((position.0 + rotation_1.0 .0, position.1 + rotation_1.0 .1));
         queue.push_back((
@@ -73,6 +80,7 @@ fn bfs_with_cost(map: &mut Vec<Vec<char>>, starting_position: (isize, isize)) ->
             cost + 1001,
             path_rotation_1,
         ));
+
         let mut path_rotation_2 = path.clone();
         path_rotation_2.push((position.0 + rotation_2.0 .0, position.1 + rotation_2.0 .1));
         queue.push_back((
@@ -81,9 +89,6 @@ fn bfs_with_cost(map: &mut Vec<Vec<char>>, starting_position: (isize, isize)) ->
             cost + 1001,
             path_rotation_2,
         ));
-    }
-    for tile in best_path.iter() {
-        map[tile.1 as usize][tile.0 as usize] = 'O';
     }
     (output, best_path.len())
 }
