@@ -70,7 +70,7 @@ fn bfs_with_cost(map: &mut Vec<Vec<char>>, starting_position: (isize, isize)) ->
         queue.push_back((
             (position.0 + rotation_1.0 .0, position.1 + rotation_1.0 .1),
             rotation_1.1,
-            cost + 1000 + 1,
+            cost + 1001,
             path_rotation_1,
         ));
         let mut path_rotation_2 = path.clone();
@@ -78,7 +78,7 @@ fn bfs_with_cost(map: &mut Vec<Vec<char>>, starting_position: (isize, isize)) ->
         queue.push_back((
             (position.0 + rotation_2.0 .0, position.1 + rotation_2.0 .1),
             rotation_2.1,
-            cost + 1000 + 1,
+            cost + 1001,
             path_rotation_2,
         ));
     }
