@@ -1,40 +1,47 @@
-use std::time::{Duration, SystemTime};
-
 use regex::Regex;
 
 pub fn puzzle_1(input: &str) -> String {
     let (a, b, c, p): (usize, usize, usize, Vec<usize>) = handle_input(input);
     let mut computer = Computer::new(a, b, c, p);
-    computer.solve().unwrap().join(",")
+    computer.solve().join(",")
 }
 
 // First digit changes every increment of A
 // Second digit changes every 8th increment of A
 // Third digit changes every 64th increment of A
 // Fourth digit changes every 512th increment of A
-// --> 8^output_position_digit changes
+// and so on.
 // Program: 2,4,1,5,7,5,1,6,0,3,4,2,5,5,3,0
 
 pub fn puzzle_2(input: &str) -> String {
     let (_, b, c, p) = handle_input(input);
+
     let mut computer = Computer::new(0, b, c, p.clone());
-    let mut _solve_output = None;
     let program_input: Vec<String> = p.iter().map(|val| val.to_string()).collect();
 
-    let mut a = 0;
+    let mut factors = vec![0; program_input.len()];
 
     loop {
+        let mut a = 0;
+        for (i, factor) in factors.iter().enumerate() {
+            a += 8usize.pow(i as u32) * *factor as usize;
+        }
         computer.reset();
-        a += 1;
         computer.a = a;
-        println!("A: {a}");
-        _solve_output = computer.solve();
-        if let Some(oup) = &_solve_output {
-            if *oup == program_input {
-                return a.to_string();
+        let program_output = computer.solve();
+        if program_output == program_input {
+            return a.to_string();
+        }
+        for i in (0..program_input.len()).rev() {
+            if program_output.len() < i {
+                factors[i] += 1;
+                break;
+            }
+            if program_output[i] != program_input[i] {
+                factors[i] += 1;
+                break;
             }
         }
-        println!("Output: {:?}", _solve_output.unwrap());
     }
 }
 
@@ -44,41 +51,19 @@ fn handle_input(input: &str) -> (usize, usize, usize, Vec<usize>) {
     let mut c = 0;
     let mut p = Vec::new();
 
-    let regex = Regex::new(r"(\d+)").unwrap();
+    let re = Regex::new(r"(\d+)").unwrap();
 
     for (i, line) in input.lines().enumerate() {
-        if i == 0 {
-            a = regex
-                .captures(&line)
-                .unwrap()
-                .get(1)
-                .unwrap()
-                .as_str()
-                .parse()
-                .unwrap();
-        } else if i == 1 {
-            b = regex
-                .captures(&line)
-                .unwrap()
-                .get(1)
-                .unwrap()
-                .as_str()
-                .parse()
-                .unwrap();
-        } else if i == 2 {
-            c = regex
-                .captures(&line)
-                .unwrap()
-                .get(1)
-                .unwrap()
-                .as_str()
-                .parse()
-                .unwrap();
-        } else if i == 4 {
-            p = regex
-                .captures_iter(&line)
-                .map(|cap| cap.get(0).unwrap().as_str().parse().unwrap())
-                .collect();
+        for (_, [x]) in re.captures_iter(line).map(|c| c.extract()) {
+            if i == 0 {
+                a = x.parse::<usize>().unwrap();
+            } else if i == 1 {
+                b = x.parse::<usize>().unwrap();
+            } else if i == 2 {
+                c = x.parse::<usize>().unwrap();
+            } else if i >= 3 {
+                p.push(x.parse::<usize>().unwrap());
+            }
         }
     }
     (a, b, c, p)
@@ -89,7 +74,7 @@ struct Computer {
     b: usize,
     c: usize,
     p: Vec<usize>,
-    active_instruction: usize,
+    instruction_pointer: usize,
     output: Vec<String>,
 }
 
@@ -100,7 +85,7 @@ impl Computer {
             b,
             c,
             p,
-            active_instruction: 0,
+            instruction_pointer: 0,
             output: vec![],
         }
     }
@@ -108,57 +93,45 @@ impl Computer {
     fn reset(&mut self) {
         self.b = 0;
         self.c = 0;
-        self.active_instruction = 0;
+        self.instruction_pointer = 0;
         self.output = Vec::new();
     }
 
-    fn do_instruction(&mut self, instruction: usize, literal: usize) -> bool {
+    fn do_instruction(&mut self, instruction: usize, literal: usize) {
         let combo_operand = match literal {
             0..=3 => literal,
             4 => self.a,
             5 => self.b,
             6 => self.c,
-            _ => return false,
+            _ => panic!("Wrong operand"),
         };
-        let mut did_jump = false;
         match instruction {
             0 => self.a /= 2_usize.pow(combo_operand as u32),
             1 => self.b ^= literal,
             2 => self.b = combo_operand % 8,
             3 => {
                 if self.a != 0 {
-                    self.active_instruction = literal;
-                    did_jump = true;
+                    self.instruction_pointer = literal;
+                    return;
                 }
             }
             4 => self.b ^= self.c,
             5 => self.output.push((combo_operand % 8).to_string()),
             6 => self.b = self.a / 2_u32.pow(combo_operand as u32) as usize,
             7 => self.c = self.a / 2_u32.pow(combo_operand as u32) as usize,
-            _ => return false,
+            _ => (),
         }
-        if !did_jump {
-            self.active_instruction += 2;
-        }
-        true
+        self.instruction_pointer += 2;
     }
 
-    fn solve(&mut self) -> Option<Vec<String>> {
-        let now = SystemTime::now();
-        while self.active_instruction < (self.p.len() - 1) {
-            let outp = self.do_instruction(
-                self.p[self.active_instruction],
-                self.p[self.active_instruction + 1],
+    fn solve(&mut self) -> Vec<String> {
+        while self.instruction_pointer < (self.p.len() - 1) {
+            self.do_instruction(
+                self.p[self.instruction_pointer],
+                self.p[self.instruction_pointer + 1],
             );
-            if outp == false {
-                return None;
-            }
-            if now.elapsed().unwrap() > Duration::from_millis(1000) {
-                println!("Elapsed {:?}", now.elapsed().unwrap());
-                return None;
-            }
         }
-        Some(self.output.clone())
+        self.output.clone()
     }
 }
 
