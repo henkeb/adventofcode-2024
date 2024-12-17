@@ -61,7 +61,7 @@ fn handle_input(input: &str) -> (usize, usize, usize, Vec<usize>) {
                 b = x.parse::<usize>().unwrap();
             } else if i == 2 {
                 c = x.parse::<usize>().unwrap();
-            } else if i >= 3 {
+            } else {
                 p.push(x.parse::<usize>().unwrap());
             }
         }
