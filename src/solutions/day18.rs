@@ -89,14 +89,25 @@ pub fn puzzle_1(input: &str) -> String {
 
 pub fn puzzle_2(input: &str) -> String {
     let bytes = handle_input(input);
+    let mut path: HashSet<Point> = HashSet::new();
+
     let mut map = vec![vec!['.'; 7]; 7];
     for (i, byte) in bytes.iter().enumerate() {
         map[byte.1 as usize][byte.0 as usize] = '#';
         if i < 12 {
+            if i == 11 {
+                path = a_star(&map, Point { x: 0, y: 0 }, Point { x: 6, y: 6 });
+            }
             continue;
         }
-        if a_star(&map, Point { x: 0, y: 0 }, Point { x: 6, y: 6 }).is_empty() {
-            return format!("{},{}", byte.0, byte.1);
+        if path.contains(&Point {
+            x: byte.0,
+            y: byte.1,
+        }) {
+            path = a_star(&map, Point { x: 0, y: 0 }, Point { x: 6, y: 6 });
+            if path.is_empty() {
+                return format!("{},{}", byte.0, byte.1);
+            }
         }
     }
 
@@ -104,10 +115,19 @@ pub fn puzzle_2(input: &str) -> String {
     // for (i, byte) in bytes.iter().enumerate() {
     //     map[byte.1 as usize][byte.0 as usize] = '#';
     //     if i < 1024 {
+    //         if i == 1023 {
+    //             path = a_star(&map, Point { x: 0, y: 0 }, Point { x: 70, y: 70 });
+    //         }
     //         continue;
     //     }
-    //     if a_star(&map, Point { x: 0, y: 0 }, Point { x: 70, y: 70 }).is_empty() {
-    //         return format!("{},{}", byte.0, byte.1);
+    //     if path.contains(&Point {
+    //         x: byte.0,
+    //         y: byte.1,
+    //     }) {
+    //         path = a_star(&map, Point { x: 0, y: 0 }, Point { x: 70, y: 70 });
+    //         if path.is_empty() {
+    //             return format!("{},{}", byte.0, byte.1);
+    //         }
     //     }
     // }
     "Not found!".to_string()
@@ -171,7 +191,6 @@ fn a_star(map: &Vec<Vec<char>>, start: Point, end: Point) -> HashSet<Point> {
 
     while let Some(Reverse(node)) = open_list.pop() {
         closed_list.insert(node.point.clone());
-        // Check North
         for (x, y) in [(0, -1), (0, 1), (-1, 0), (1, 0)] {
             let new_point = Point {
                 x: node.point.x + x,
