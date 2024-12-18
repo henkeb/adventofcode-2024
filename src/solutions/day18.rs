@@ -172,72 +172,23 @@ fn a_star(map: &Vec<Vec<char>>, start: Point, end: Point) -> HashSet<Point> {
     while let Some(Reverse(node)) = open_list.pop() {
         closed_list.insert(node.point.clone());
         // Check North
-        let north = Point {
-            x: node.point.x,
-            y: node.point.y - 1,
-        };
-        if do_checks(
-            &node.point,
-            north,
-            &max_len,
-            &end,
-            &mut tile_details,
-            &mut closed_list,
-            &mut open_list,
-            map,
-        ) {
-            return get_path(&tile_details, &end);
-        }
-        // Check South
-        let south = Point {
-            x: node.point.x,
-            y: node.point.y + 1,
-        };
-        if do_checks(
-            &node.point,
-            south,
-            &max_len,
-            &end,
-            &mut tile_details,
-            &mut closed_list,
-            &mut open_list,
-            map,
-        ) {
-            return get_path(&tile_details, &end);
-        }
-        // Check West
-        let west = Point {
-            x: node.point.x - 1,
-            y: node.point.y,
-        };
-        if do_checks(
-            &node.point,
-            west,
-            &max_len,
-            &end,
-            &mut tile_details,
-            &mut closed_list,
-            &mut open_list,
-            map,
-        ) {
-            return get_path(&tile_details, &end);
-        }
-        // Check East
-        let east = Point {
-            x: node.point.x + 1,
-            y: node.point.y,
-        };
-        if do_checks(
-            &node.point,
-            east,
-            &max_len,
-            &end,
-            &mut tile_details,
-            &mut closed_list,
-            &mut open_list,
-            map,
-        ) {
-            return get_path(&tile_details, &end);
+        for (x, y) in [(0, -1), (0, 1), (-1, 0), (1, 0)] {
+            let new_point = Point {
+                x: node.point.x + x,
+                y: node.point.y + y,
+            };
+            if do_checks(
+                &node.point,
+                new_point,
+                &max_len,
+                &end,
+                &mut tile_details,
+                &mut closed_list,
+                &mut open_list,
+                map,
+            ) {
+                return get_path(&tile_details, &end);
+            }
         }
     }
     HashSet::default()
