@@ -143,12 +143,8 @@ fn is_tile_valid(point: &Point, max_len: &Point) -> bool {
     false
 }
 
-fn is_tile_blocked(map: &Vec<Vec<char>>, point: &Point) -> bool {
-    if map[point.y as usize][point.x as usize] == '.' {
-        true
-    } else {
-        false
-    }
+fn is_tile_free(map: &Vec<Vec<char>>, point: &Point) -> bool {
+    map[point.y as usize][point.x as usize] == '.'
 }
 
 fn calculate_h_value(current: &Point, target: &Point) -> isize {
@@ -169,8 +165,8 @@ fn get_path(tile_details: &Vec<Vec<Tile>>, end: &Point) -> HashSet<Point> {
 
 fn a_star(map: &Vec<Vec<char>>, start: Point, end: Point) -> HashSet<Point> {
     let max_len = Point {
-        x: end.x + 1,
-        y: end.y + 1,
+        x: map[0].len() as isize,
+        y: map.len() as isize,
     };
 
     let mut closed_list: HashSet<Point> = HashSet::new();
@@ -227,9 +223,7 @@ fn do_checks(
         if new_point == *end {
             tile_details[new_point.y as usize][new_point.x as usize].parent = parent.clone();
             return true;
-        } else if !closed_list.contains(&new_point)
-            && map[new_point.y as usize][new_point.x as usize] == '.'
-        {
+        } else if !closed_list.contains(&new_point) && is_tile_free(&map, &new_point) {
             let g_new = tile_details[parent.y as usize][parent.x as usize].g + 1;
             let h_new = calculate_h_value(&new_point, &end);
             let f_new = g_new + h_new;
