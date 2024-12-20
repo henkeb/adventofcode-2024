@@ -7,16 +7,24 @@ pub fn puzzle_1(input: &str) -> String {
     let mut tiles = dfs(&map, start_pos, end_pos);
     let _path = get_path(&mut tiles, end_pos);
 
-    check_shortcuts(&map, &tiles, start_pos, end_pos)
+    check_shortcuts(&map, &tiles, start_pos, end_pos, 2)
         .iter()
-        .filter(|(_, &cost)| cost >= 100)
-        .count()
+        .map(|(_, num)| num)
+        .sum::<usize>()
         .to_string()
 }
 
 pub fn puzzle_2(input: &str) -> String {
-    let _ = handle_input(input);
-    "Not implemented yet!".to_string()
+    let map = handle_input(input);
+    let start_pos = find_start_pos(&map);
+    let end_pos = find_end_pos(&map);
+    let mut tiles = dfs(&map, start_pos, end_pos);
+    let _path = get_path(&mut tiles, end_pos);
+    check_shortcuts(&map, &tiles, start_pos, end_pos, 20)
+        .iter()
+        .map(|(_, num)| num)
+        .sum::<usize>()
+        .to_string()
 }
 
 #[derive(Clone, Debug)]
@@ -40,53 +48,41 @@ fn check_shortcuts(
     tiles: &Vec<Vec<Tile>>,
     start_pos: (isize, isize),
     end_pos: (isize, isize),
-) -> HashMap<(isize, isize), usize> {
+    cheat_distance: isize,
+) -> HashMap<usize, usize> {
     let max_len: (isize, isize) = (map[0].len() as isize, map.len() as isize);
     let mut active_point = start_pos.clone();
-    let mut cheat_paths: HashMap<(isize, isize), usize> = HashMap::new();
-    let mut visited: HashSet<(isize, isize)> = HashSet::new();
+    let mut cheat_paths: HashMap<usize, usize> = HashMap::new();
     while active_point != end_pos {
-        for (x, y) in [(-1, 0), (1, 0), (0, -1), (0, 1)].iter() {
-            if !is_tile_valid((active_point.0 + x, active_point.1 + y), max_len)
-                || is_tile_free(&map, &(active_point.0 + x, active_point.1 + y))
-            {
-                continue;
-            }
-            if is_tile_valid((active_point.0 + x * 2, active_point.1 + y * 2), max_len)
-                && is_tile_free(&map, &(active_point.0 + x * 2, active_point.1 + y * 2))
-            {
-                if visited.contains(&(active_point.0 + x * 2, active_point.1 + y * 2)) {
+        for dy in -cheat_distance..=cheat_distance {
+            let new_y = active_point.1 + dy;
+
+            let remaining = cheat_distance - dy.abs();
+            for dx in -remaining..=remaining {
+                let new_x = active_point.0 + dx;
+                if !is_tile_valid((new_x, new_y), max_len) {
                     continue;
                 }
-                // let jump = active_point;
-                // let jump_to = (
-                //     active_point.0 + x * 2 as isize,
-                //     active_point.1 + y * 2 as isize,
-                // );
-                // let cost_to_jump = tiles[active_point.1 as usize][active_point.0 as usize].cost;
-                // let cost_after_jump = tiles[(active_point.1 + y * 2) as usize]
-                //     [(active_point.0 + x * 2) as usize]
-                //     .cost;
-                // let cost_jumper = total_cost
-                //     - tiles[(active_point.1 + y * 2) as usize][(active_point.0 + x * 2) as usize]
-                //         .cost;
-                // println!("Before jump: {jump:?}, cost to this point {cost_to_jump}");
-                // println!("After jumper: {jump_to:?}, cost to this point {cost_after_jump}");
-                // println!(
-                //     "After jump: {jump_to:?}, cost to this point {}",
-                //     total_cost - cost_to_jump
-                // );
-                //
-                cheat_paths.insert(
-                    (active_point.0 + x, active_point.1 + y),
-                    tiles[(active_point.1 + y * 2) as usize][(active_point.0 + x * 2) as usize]
-                        .cost
-                        - tiles[active_point.1 as usize][active_point.0 as usize].cost
-                        - 2,
-                );
-                visited.insert(active_point);
+
+                if !is_tile_free(map, &(new_x, new_y)) {
+                    continue;
+                }
+                let cost = tiles[new_y as usize][new_x as usize].cost;
+                let cheated_distance = dy.abs() + dx.abs();
+                let total_saved_cost = cost as isize
+                    - tiles[active_point.1 as usize][active_point.0 as usize].cost as isize
+                    - cheated_distance;
+                if total_saved_cost < 100 {
+                    continue;
+                }
+
+                cheat_paths
+                    .entry(total_saved_cost as usize)
+                    .and_modify(|cnt| *cnt += 1)
+                    .or_insert(1);
             }
         }
+
         active_point = tiles[active_point.1 as usize][active_point.0 as usize].next
     }
     cheat_paths
@@ -126,6 +122,10 @@ fn dfs(map: &Vec<Vec<char>>, start_pos: (isize, isize), end_pos: (isize, isize))
         }
     }
     panic!("Couldnt find end node");
+}
+
+fn manhattan_distance(active_position: (isize, isize), end_pos: (isize, isize)) -> isize {
+    (active_position.0.abs_diff(end_pos.0) + active_position.1.abs_diff(end_pos.1)) as isize
 }
 
 fn is_tile_free(map: &Vec<Vec<char>>, point: &(isize, isize)) -> bool {
@@ -217,13 +217,32 @@ mod tests {
 #...#...#...###
 ###############";
 
-    #[test]
-    fn test_1() {
-        assert_eq!(puzzle_1(&INPUT), "");
-    }
+    // #[test]
+    // fn test_1() {
+    //     assert_eq!(puzzle_1(&INPUT), "");
+    // }
 
-    #[test]
-    fn test_2() {
-        assert_eq!(puzzle_2(&INPUT), "");
-    }
+    // #[test]
+    // fn test_2() {
+    //     assert_eq!(puzzle_2(&INPUT), "");
+    // }
 }
+// let jump = active_point;
+// let jump_to = (
+//     active_point.0 + x * 2 as isize,
+//     active_point.1 + y * 2 as isize,
+// );
+// let cost_to_jump = tiles[active_point.1 as usize][active_point.0 as usize].cost;
+// let cost_after_jump = tiles[(active_point.1 + y * 2) as usize]
+//     [(active_point.0 + x * 2) as usize]
+//     .cost;
+// let cost_jumper = total_cost
+//     - tiles[(active_point.1 + y * 2) as usize][(active_point.0 + x * 2) as usize]
+//         .cost;
+// println!("Before jump: {jump:?}, cost to this point {cost_to_jump}");
+// println!("After jumper: {jump_to:?}, cost to this point {cost_after_jump}");
+// println!(
+//     "After jump: {jump_to:?}, cost to this point {}",
+//     total_cost - cost_to_jump
+// );
+//
