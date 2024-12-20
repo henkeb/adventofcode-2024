@@ -7,7 +7,6 @@ pub fn puzzle_1(input: &str) -> String {
     let mut tiles = dfs(&map, start_pos, end_pos);
     update_tiles(&mut tiles, end_pos);
 
-    dbg!(check_shortcuts(&map, &tiles, start_pos, end_pos, 2));
     check_shortcuts(&map, &tiles, start_pos, end_pos, 2)
         .iter()
         .filter(|(&cost, _)| cost >= 100)
