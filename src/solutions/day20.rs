@@ -5,10 +5,12 @@ pub fn puzzle_1(input: &str) -> String {
     let start_pos = find_start_pos(&map);
     let end_pos = find_end_pos(&map);
     let mut tiles = dfs(&map, start_pos, end_pos);
-    let _path = get_path(&mut tiles, end_pos);
+    update_tiles(&mut tiles, end_pos);
 
+    dbg!(check_shortcuts(&map, &tiles, start_pos, end_pos, 2));
     check_shortcuts(&map, &tiles, start_pos, end_pos, 2)
         .iter()
+        .filter(|(&cost, _)| cost >= 100)
         .map(|(_, num)| num)
         .sum::<usize>()
         .to_string()
@@ -19,9 +21,10 @@ pub fn puzzle_2(input: &str) -> String {
     let start_pos = find_start_pos(&map);
     let end_pos = find_end_pos(&map);
     let mut tiles = dfs(&map, start_pos, end_pos);
-    let _path = get_path(&mut tiles, end_pos);
+    update_tiles(&mut tiles, end_pos);
     check_shortcuts(&map, &tiles, start_pos, end_pos, 20)
         .iter()
+        .filter(|(&saved_cost, _)| saved_cost >= 100)
         .map(|(_, num)| num)
         .sum::<usize>()
         .to_string()
@@ -72,10 +75,9 @@ fn check_shortcuts(
                 let total_saved_cost = cost as isize
                     - tiles[active_point.1 as usize][active_point.0 as usize].cost as isize
                     - cheated_distance;
-                if total_saved_cost < 100 {
+                if total_saved_cost.is_negative() {
                     continue;
                 }
-
                 cheat_paths
                     .entry(total_saved_cost as usize)
                     .and_modify(|cnt| *cnt += 1)
@@ -132,19 +134,16 @@ fn is_tile_free(map: &Vec<Vec<char>>, point: &(isize, isize)) -> bool {
     map[point.1 as usize][point.0 as usize] != '#'
 }
 
-fn get_path(tile_details: &mut Vec<Vec<Tile>>, end: (isize, isize)) -> HashSet<(isize, isize)> {
+fn update_tiles(tile_details: &mut Vec<Vec<Tile>>, end: (isize, isize)) {
     let mut active_point = end.clone();
     let mut next = end;
-    let mut path = HashSet::new();
     while active_point != tile_details[active_point.1 as usize][active_point.0 as usize].previous {
-        path.insert(active_point.clone());
         active_point = tile_details[active_point.1 as usize][active_point.0 as usize]
             .previous
             .clone();
         tile_details[active_point.1 as usize][active_point.0 as usize].next = next;
         next = active_point.clone();
     }
-    path
 }
 
 fn is_tile_valid(point: (isize, isize), max_len: (isize, isize)) -> bool {
