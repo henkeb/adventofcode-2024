@@ -227,22 +227,3 @@ mod tests {
     //     assert_eq!(puzzle_2(&INPUT), "");
     // }
 }
-// let jump = active_point;
-// let jump_to = (
-//     active_point.0 + x * 2 as isize,
-//     active_point.1 + y * 2 as isize,
-// );
-// let cost_to_jump = tiles[active_point.1 as usize][active_point.0 as usize].cost;
-// let cost_after_jump = tiles[(active_point.1 + y * 2) as usize]
-//     [(active_point.0 + x * 2) as usize]
-//     .cost;
-// let cost_jumper = total_cost
-//     - tiles[(active_point.1 + y * 2) as usize][(active_point.0 + x * 2) as usize]
-//         .cost;
-// println!("Before jump: {jump:?}, cost to this point {cost_to_jump}");
-// println!("After jumper: {jump_to:?}, cost to this point {cost_after_jump}");
-// println!(
-//     "After jump: {jump_to:?}, cost to this point {}",
-//     total_cost - cost_to_jump
-// );
-//
